@@ -1,5 +1,7 @@
 using Auth_BackEnd.Context;
+using Auth_BackEnd.Helpers;
 using Auth_BackEnd.Model;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,6 +38,12 @@ namespace Auth_BackEnd
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddSingleton(provider => new MapperConfiguration(config =>
+             {
+                 config.AddProfile(new AutoMapperProfiles());
+             }).CreateMapper()
+         );
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => options.TokenValidationParameters =
@@ -104,7 +112,7 @@ namespace Auth_BackEnd
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    context.Database.Migrate();
+                context.Database.Migrate();
             }
 
             app.UseEndpoints(endpoints =>

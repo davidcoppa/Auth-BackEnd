@@ -2,7 +2,8 @@
   "runtimeOptions": {
     "additionalProbingPaths": [
       "C:\\Users\\matlock\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\matlock\\.nuget\\packages"
+      "C:\\Users\\matlock\\.nuget\\packages",
+      "D:\\Programs\\Vs-2019-Shared\\NuGetPackages"
     ]
   }
 }

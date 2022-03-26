@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj": {}
+    "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj": {}
   },
   "projects": {
-    "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj": {
+    "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
+        "projectUniqueName": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
         "projectName": "Auth-BackEnd",
-        "projectPath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
+        "projectPath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
         "packagesPath": "C:\\Users\\matlock\\.nuget\\packages\\",
-        "outputPath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\obj\\",
+        "outputPath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "D:\\Programs\\Vs-2019-Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
           "C:\\Users\\matlock\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

@@ -20,14 +20,13 @@ namespace Auth_BackEnd.Helpers
         private readonly UserManager<ApplicationUser> userManager;
 
         public Token(IConfiguration configuration,
-            UserManager<ApplicationUser> userManager
-            )
+            UserManager<ApplicationUser> userManager)
         {
             this.configuration = configuration;
             this.userManager = userManager;
 
         }
-        internal  async Task<ActionResult<UserToken>> BuildTokenAsync(UserInfo userInfo)
+        internal async Task<ActionResult<UserToken>> BuildTokenAsync(UserInfo userInfo)
         {
 
             var claims = new List<Claim>
@@ -37,7 +36,7 @@ namespace Auth_BackEnd.Helpers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-           
+
             var usuario = await userManager.FindByEmailAsync(userInfo.Email);
             var roles = await userManager.GetClaimsAsync(usuario);
 
@@ -46,7 +45,6 @@ namespace Auth_BackEnd.Helpers
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            // Tiempo de expiración del token. En nuestro caso lo hacemos de una hora.
             var expiration = DateTime.UtcNow.AddMonths(1);
 
             JwtSecurityToken token = new JwtSecurityToken(

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "gAmwK/TMWuSpEWU01yU5GtJfpLJ5x8c80KFSgoUMAXbpoCu5RLmrASNr+/P4HtzQwVhiYlTQQLKpbCBPvaovZA==",
+  "dgSpecHash": "fdu6/TQDvC2Tpe7fjGT23Rh3C6XoaRHEqOSv4TDTqzjMFSWNAhFL6WWWxAe1OWcFvtMkN31GFRZcVC+u66ToWw==",
   "success": true,
-  "projectFilePath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth-BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
+  "projectFilePath": "D:\\Dropbox\\david\\code\\GitHub\\C#\\Auth BackEnd\\Auth-BackEnd\\Auth-BackEnd.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\matlock\\.nuget\\packages\\automapper\\10.1.1\\automapper.10.1.1.nupkg.sha512",
     "C:\\Users\\matlock\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",

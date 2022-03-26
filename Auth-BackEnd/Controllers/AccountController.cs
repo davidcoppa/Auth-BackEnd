@@ -4,6 +4,7 @@ using Auth_BackEnd.Model;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -25,28 +26,28 @@ namespace Auth_BackEnd.Controllers
         private readonly IMapper mapper;
         private readonly Token token;
         private readonly ILogger<AccountController> logger;
-
+        private List<string> errors;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration configuration,
             IMapper mapper,
-            ILogger<AccountController> logger,
-
-            Token token)
+            ILogger<AccountController> logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.configuration = configuration;
             this.mapper = mapper;
             this.logger = logger;
-            this.token = token;
+            this.token = new Token(configuration, userManager);
 
         }
 
 
         [HttpPost("Create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<UserToken>> Create([FromBody] NewUserDTO model)
         {
             try
@@ -63,19 +64,28 @@ namespace Auth_BackEnd.Controllers
                 }
                 else
                 {
-                    return BadRequest("Username or password invalid");
+                    errors = new();
+                    foreach (var error in result.Errors)
+                    {
+                        errors.Add(error.Description);
+                    }
+                    return BadRequest(errors);
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.Message);
 
-                return BadRequest(ex.Message );
+                return BadRequest(ex.Message);
 
             }
 
         }
 
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost("Login")]
         public async Task<ActionResult<UserToken>> Login([FromBody] UserDTO userDTO)
         {
@@ -83,14 +93,27 @@ namespace Auth_BackEnd.Controllers
             {
                 UserInfo userInfo = mapper.Map<UserInfo>(userDTO);
 
-                var result = await signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, isPersistent: false, lockoutOnFailure: false);
+                Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, isPersistent: false, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
                     return await token.BuildTokenAsync(userInfo);
                 }
-                else
+                else if (result.IsLockedOut)
                 {
-                    return BadRequest("Invalid Username or Password.");
+                     return BadRequest("User is locked.");
+                }
+                else if (result.IsNotAllowed)
+                {
+                    return BadRequest("User is not allowed to singIn.");
+                }
+                else if (result.RequiresTwoFactor)
+                {
+                    return BadRequest("Requires two factor authentication.");
+                }
+                else 
+                {
+                    return BadRequest("Invalid username or password.");
                 }
             }
             catch (Exception ex)
@@ -102,8 +125,11 @@ namespace Auth_BackEnd.Controllers
         }
 
 
+
         [HttpPost("AddRol")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> AddRoles([FromBody] UserRolDTO userDTO)
         {
             try
@@ -119,19 +145,21 @@ namespace Auth_BackEnd.Controllers
                 {
                     return BadRequest("we coudn't find the user, to assign the rol");
                 }
-              
+
             }
             catch (Exception ex)
             {
 
                 logger.LogError(ex.Message);
 
-                return BadRequest(ex.Message); 
+                return BadRequest(ex.Message);
             }
-           
+
         }
         [HttpPost("DeleteRol")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> DeleteRol([FromBody] UserRolDTO userDTO)
         {
             try
@@ -160,6 +188,8 @@ namespace Auth_BackEnd.Controllers
         }
         [HttpPost("GetUserLoggedData")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetUserLoggedData()
         {
             try
@@ -176,7 +206,7 @@ namespace Auth_BackEnd.Controllers
 
                 return BadRequest(ex.Message);
             }
-         
+
 
         }
 
