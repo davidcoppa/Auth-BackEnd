@@ -10,5 +10,10 @@ namespace Auth_BackEnd.DTOs
     {
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }
+        [Required(ErrorMessage = "Rol is required")]
+        public string Rol { get; set; }
+        [Required(ErrorMessage = "Status is required")]
+        public bool Status { get; set; }
+
     }
 }

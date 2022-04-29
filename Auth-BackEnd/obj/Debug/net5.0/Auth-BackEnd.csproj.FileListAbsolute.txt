@@ -130,3 +130,4 @@ D:\Dropbox\david\code\GitHub\C#\Auth BackEnd\Auth-BackEnd\obj\Debug\net5.0\Auth-
 D:\Dropbox\david\code\GitHub\C#\Auth BackEnd\Auth-BackEnd\obj\Debug\net5.0\ref\Auth-BackEnd.dll
 D:\Dropbox\david\code\GitHub\C#\Auth BackEnd\Auth-BackEnd\obj\Debug\net5.0\Auth-BackEnd.pdb
 D:\Dropbox\david\code\GitHub\C#\Auth BackEnd\Auth-BackEnd\obj\Debug\net5.0\Auth-BackEnd.genruntimeconfig.cache
+D:\Dropbox\david\code\GitHub\C#\Auth BackEnd\Auth-BackEnd\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.InMemory.dll

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Auth_BackEnd.Context
 {
-    public class ApplicationDbContext :  IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
         private readonly Action<ApplicationDbContext, ModelBuilder> _customizeModel;
@@ -36,11 +36,13 @@ namespace Auth_BackEnd.Context
                 Id = "E09D0551-C919-4F3D-9BDD-6FF2F983CF94",
                 UserName = "admintest",
                 Email = "admintest@test.com",
+                EmailConfirmed = true,
+                NormalizedEmail = "ADMINTEST@TEST.COM",
+
             };
 
             PasswordHasher<ApplicationUser> passwordHasher = new PasswordHasher<ApplicationUser>();
-            passwordHasher.HashPassword(user, "Admin.123");
-
+            user.PasswordHash = passwordHasher.HashPassword(user, "Admin.123");
             builder.Entity<ApplicationUser>().HasData(user);
 
             user = new ApplicationUser()
@@ -48,10 +50,12 @@ namespace Auth_BackEnd.Context
                 Id = "403B0631-D0DC-4910-B408-EB448E7869AC",
                 UserName = "userTest",
                 Email = "usertest@test.com",
+                EmailConfirmed = true,
+                NormalizedEmail = "USERTEST@TEST.COM",
             };
 
             passwordHasher = new PasswordHasher<ApplicationUser>();
-            passwordHasher.HashPassword(user, "User.123");
+            user.PasswordHash = passwordHasher.HashPassword(user, "User.123");
 
             builder.Entity<ApplicationUser>().HasData(user);
         }
@@ -82,9 +86,9 @@ namespace Auth_BackEnd.Context
         private void SeedUserRoles(ModelBuilder builder)
         {
             builder.Entity<IdentityUserRole<string>>().HasData(
-               new IdentityUserRole<string>() 
+               new IdentityUserRole<string>()
                {
-                   RoleId = "F7D5F796-9D38-46AD-818E-454C349E5072", 
+                   RoleId = "F7D5F796-9D38-46AD-818E-454C349E5072",
                    UserId = "E09D0551-C919-4F3D-9BDD-6FF2F983CF94"
                }
                );
@@ -96,15 +100,41 @@ namespace Auth_BackEnd.Context
                }
                );
         }
+
+        private void SeedClaims(ModelBuilder builder)
+        {
+            builder.Entity<IdentityUserClaim<string>>().HasData(
+                new IdentityUserClaim<string>()
+                {
+                    UserId = "E09D0551-C919-4F3D-9BDD-6FF2F983CF94",
+                    Id = 1,
+                    ClaimType = "IsAdmin",
+                    ClaimValue = "1"
+                });
+
+            builder.Entity<IdentityUserClaim<string>>().HasData(
+               new IdentityUserClaim<string>()
+               {
+                   UserId = "403B0631-D0DC-4910-B408-EB448E7869AC",
+                   Id = 2,
+                   ClaimType = "IsUser",
+                   ClaimValue = "1"
+               });
+
+        }
+
+      
         protected override void OnModelCreating(ModelBuilder builder)
         {
             SeedUsers(builder);
             SeedRoles(builder);
             SeedUserRoles(builder);
-
+            SeedClaims(builder);
 
 
             base.OnModelCreating(builder);
         }
+
+
     }
 }

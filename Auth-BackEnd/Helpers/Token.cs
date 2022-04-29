@@ -32,7 +32,7 @@ namespace Auth_BackEnd.Helpers
             var claims = new List<Claim>
             {
                 new Claim("email", userInfo.Email),
-                new Claim("TokienUserValue", "a6sASASdl545fkFDSGawobdw6pefnNPBDFNABPKDF12kjgdfyujnbvcxNBS6954LASNFBALSN55SDF5B4DF"),
+                new Claim("TokenUserValue", "a6sASASdl545fkFDSGawobdw6pefnNPBDFNABPKDF12kjgdfyujnbvcxNBS6954LASNFBALSN55SDF5B4DF"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -40,7 +40,11 @@ namespace Auth_BackEnd.Helpers
             var usuario = await userManager.FindByEmailAsync(userInfo.Email);
             var roles = await userManager.GetClaimsAsync(usuario);
 
-            claims.AddRange(roles);
+            foreach (var rol in roles)
+            {
+                claims.Add(rol);
+            }
+        //    claims.AddRange(roles);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

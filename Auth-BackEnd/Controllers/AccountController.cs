@@ -17,6 +17,9 @@ using System.Threading.Tasks;
 
 namespace Auth_BackEnd.Controllers
 {
+    [ApiController]
+    [Route("api/user")]
+
     public class AccountController : ControllerBase
     {
 
@@ -27,6 +30,7 @@ namespace Auth_BackEnd.Controllers
         private readonly Token token;
         private readonly ILogger<AccountController> logger;
         private List<string> errors;
+
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -57,6 +61,7 @@ namespace Auth_BackEnd.Controllers
 
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await userManager.CreateAsync(user, model.Password);
+            //    await userManager.AddClaimAsync(user, new Claim("IsAdmin", "True"));
 
                 if (result.Succeeded)
                 {
@@ -94,14 +99,13 @@ namespace Auth_BackEnd.Controllers
                 UserInfo userInfo = mapper.Map<UserInfo>(userDTO);
 
                 Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(userInfo.Email, userInfo.Password, isPersistent: false, lockoutOnFailure: false);
-
                 if (result.Succeeded)
                 {
                     return await token.BuildTokenAsync(userInfo);
                 }
                 else if (result.IsLockedOut)
                 {
-                     return BadRequest("User is locked.");
+                    return BadRequest("User is locked.");
                 }
                 else if (result.IsNotAllowed)
                 {
@@ -109,9 +113,19 @@ namespace Auth_BackEnd.Controllers
                 }
                 else if (result.RequiresTwoFactor)
                 {
-                    return BadRequest("Requires two factor authentication.");
+                    ApplicationUser user = await userManager.FindByEmailAsync(userInfo.Email);
+
+                    var token2FA = await userManager.GenerateTwoFactorTokenAsync(user, "Email");
+
+
+
+
+
+
+
+                    return Ok("Requires two factor authentication.");
                 }
-                else 
+                else
                 {
                     return BadRequest("Invalid username or password.");
                 }
@@ -125,19 +139,27 @@ namespace Auth_BackEnd.Controllers
         }
 
 
-
-        [HttpPost("AddRol")]
+        //TODO: accept a list of roles and status
+        [HttpPost("SetRol")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> AddRoles([FromBody] UserRolDTO userDTO)
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult> SetRoles([FromBody] UserRolDTO userDTO)
         {
             try
             {
-                var user = await userManager.FindByEmailAsync(userDTO.Email);
+                ApplicationUser user = await userManager.FindByEmailAsync(userDTO.Email);
                 if (user != null)
                 {
-                    await userManager.AddClaimAsync(user, new Claim("IsAdmin", "1"));
+                    if (userDTO.Status)
+                    {
+                        await userManager.AddClaimAsync(user, new Claim(userDTO.Rol, userDTO.Status.ToString()));
+                    }
+                    else
+                    {
+                        await userManager.RemoveClaimAsync(user, new Claim(userDTO.Rol, userDTO.Status.ToString()));
+                    }
 
                     return NoContent();
                 }
@@ -156,46 +178,22 @@ namespace Auth_BackEnd.Controllers
             }
 
         }
-        [HttpPost("DeleteRol")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> DeleteRol([FromBody] UserRolDTO userDTO)
-        {
-            try
-            {
-                var user = await userManager.FindByEmailAsync(userDTO.Email);
-                if (user != null)
-                {
-                    await userManager.RemoveClaimAsync(user, new Claim("IsAdmin", "0"));
+        
 
-                    return NoContent();
-                }
-                else
-                {
-                    return BadRequest("we coudn't find the user, to quit the rol");
-                }
 
-            }
-            catch (Exception ex)
-            {
 
-                logger.LogError(ex.Message);
-
-                return BadRequest(ex.Message);
-            }
-
-        }
-        [HttpPost("GetUserLoggedData")]
+        [HttpGet("GetUserLoggedData")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult> GetUserLoggedData()
         {
             try
             {
-                var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
-                var email = emailClaim.Value;
+                var userClaim = HttpContext.User.Claims.Where(claim => claim.Type.Contains("email")).FirstOrDefault();
+
+                var email = userClaim.Value;
                 ApplicationUser usuario = await userManager.FindByEmailAsync(email);
 
                 return Ok(usuario);
